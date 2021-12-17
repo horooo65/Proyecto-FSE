@@ -1,0 +1,446 @@
+<!-- Autores: -->
+<!-- Acosta Hernández Horacio Emmanuel -->
+<!-- Juárez Munguía Brandon Jesús -->
+<!-- Medina Cruz Josué Emanuel -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Control de invernadero</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <!-- Font Awesome -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css" rel="stylesheet" />
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Readex+Pro:wght@200&display=swap" rel="stylesheet">    
+    <!-- MDB -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/mdb-ui-kit/3.3.0/mdb.min.css" rel="stylesheet" />
+    <link rel="icon" href="img/favorito.ico">
+</head>
+
+<body>
+    <style>
+        body{
+            background-color: #CCFF99;
+        }
+
+        #myChart {
+            max-height: 450px !important;
+        }
+
+        .space-b-row .card {
+            margin: 2% !important;
+        }
+
+        .main-card h5 {
+            font-weight: 400;
+            font-size: 18px;
+        }
+
+        h5{
+            font-family: 'Readex Pro', sans-serif;
+        }
+
+        .card-text{
+            font-family: 'Readex Pro', sans-serif;
+        }
+
+        .card-title{
+            font-family: 'Readex Pro', sans-serif;
+        }
+
+        label {
+            font-family: 'Readex Pro', sans-serif;
+        }
+    </style>
+
+    <header>
+        <nav class="navbar navbar-expand-xl navbar-dark" style="background: #2EAD4F;">
+            <a class="navbar-brand" href="#" style="font-family: 'Readex Pro', sans-serif;">
+            <img src="img/logo.png" alt="logotipo" width="50" height="40">Control de Invernadero
+            </a>        
+        </nav>
+    </header>
+    <div class="container-fluid">
+        <div class="row space-b-row">
+            <div class="col-md-5 col-sm-12">
+                <!-- Control de temperatura del invernadero -->
+                <div class="card" style="height: 190px;">
+                    <div class="card-header">
+                        <h5><img src="img/temperatura.png" alt="logo de temperatura" width="40" height="40"> Control de temperatura del invernadero</h5>
+                    </div>
+                    <div class="card-body">
+                        <form onsubmit="return update_value('#temp_input', 'greenhouse_temperature')">
+                            <div class="form-group">
+                                <input type="range" style="background: #00FF00;" class="form-control-range" min="10" max="30" id="temp_input" oninput="change_value(this, '#new_temp')">
+                            </div>
+                            <p class="card-text">Temperatura seleccionada: <b id="new_temp"></b>°C</p>
+                            <button type="submit" class="btn btn-success btn-sm">Ajustar</button>
+                        </form>
+                    </div>
+                </div>
+                <!-- Control de potencia del radiador -->
+                <div class="card" style="height: 190px;">
+                    <div class="card-header">
+                        <h5><img src="img/radiador.png" alt="logo de radiador" width="40" height="40"> Control de potencia del radiador</h5>
+                    </div>
+                    <div class="card-body">
+                        <form onsubmit="return update_value('#power_input', 'radiator_power')">
+                            <div class="form-group">
+                                <input type="range" class="form-control-range" min="1000" max="2000" id="power_input" oninput="change_value(this, '#new_power')">
+                            </div>
+                            <p class="card-text">Potencia seleccionada: <b id="new_power"></b>W</p>
+                            <button type="submit" class="btn btn-success btn-sm">Ajustar</button>
+                        </form>
+                    </div>
+                </div>
+                <!-- Control de potencia del ventilador -->
+                <div class="card" style="height: 190px;">
+                    <div class="card-header">
+                        <h5><img src="img/ventilador.png" alt="logo de ventilador" width="40" height="40"> Control de potencia del ventilador</h5>
+                    </div>
+                    <div class="card-body">
+                        <form onsubmit="return update_value('#power_ventilator_input', 'ventilator_power')">
+                            <div class="form-group">
+                                <input type="range" class="form-control-range" min="1000" max="2000"
+                                id="power_ventilator_input" oninput="change_value(this, '#power_ventilator')">
+                            </div>
+                            <p class="card-text">Potencia seleccionada: <b id="power_ventilator"></b>W</p>
+                            <button type="submit" class="btn btn-success btn-sm">Ajustar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <!-- Grafíca de actividad -->
+            <div class="col-md-7 col-sm-12">
+                <div class="card" style="height:588px;">
+                    <div class="card-header">
+                        <h5 class="card-title"><img src="img/datos.png" alt="logo de datos" width="40" height="40"> Estado del invernadero</h5>
+                    </div>
+                    <div class="card-body main-card">
+                        <h5 class="card-text">Temperatura actual: <b id="greenhouse_temperature">30</b>°C</h5>
+                        <h5 class="card-text">Potencia actual del radiador: <b id="radiator_power">1500</b>W</h5>
+                        <h5 class="card-text">Potencia actual del ventilador: <b id="ventilator_power">1500</b>W</h5>
+                        <canvas id="myChart" width="400" height="240"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row space-b-row">
+            <div class="col-md-6 col-sm-12">
+                <!-- Programado de ciclo de irrigación-->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><img src="img/irrig.png" alt="logo de control" width="40" height="40"> Programación</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Ciclo de irrigación:</h5>
+                        <form onsubmit="return update_program('#meeting-irrig-fi', 'irrigation_program_fi')">
+                            <div class="form-group">
+                                <label for="meeting-irrig-fi">Inicio:</label>
+                                <input type="datetime-local" id="meeting-irrig-fi" class="form-control" name="meeting-irrig-fi" value="2021-12-17T19:30" min="2021-12-17T00:00" max="2022-12-17T00:00">
+                            </div>
+                            <button type="submit" class="btn btn-success btn-sm">Ajustar</button>
+                        </form>
+                        <br>
+                        <form onsubmit="return update_program('#meeting-irrig-ff', 'irrigation_program_ff')">
+                            <div class="form-group">
+                                <label for="meeting-irrig-ff">Fin:</label>
+                                <input type="datetime-local" id="meeting-irrig-ff" class="form-control" name="meeting-irrig-ff" value="2021-12-17T19:30" min="2021-12-17T00:00" max="2022-12-17T00:00">
+                            </div>
+                            <button type="submit" class="btn btn-success btn-sm">Ajustar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+               <!-- Encendido y apagado del sistema de irrigación -->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><img src="img/irrig.png" alt="logo de control" width="40" height="40"> Control del sistema de irrigación</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="card-text form-control is-valid text-center" id="irrigation_active">Sistema encendido
+                        </p>
+                        <p class="card-text form-control is-invalid text-center d-none" id="irrigation_inactive">
+                            Sistema apagado
+                        </p>
+                        <div class="custom-control custom-switch text-center">
+                            <input type="checkbox" class="custom-control-input" id="irrigation_swtich" onchange="on_off_irrigation(this)">
+                            <label class="custom-control-label" for="irrigation_swtich">Encender o apagar el sistema</label>
+                        </div>
+                    </div>
+                </div>
+                <div>
+                    <p style="text-align: center; margin-top: 50px;"><img src="img/cuida.png" alt="Cuidado" width="400" height="125"></p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row space-b-row">
+            <div class="col-md-6 col-sm-12">
+            <!-- Programado de ciclo de temperatura-->
+                <div class="card">
+                    <div class="card-header">
+                        <h5><img src="img/control.png" alt="logo de control" width="40" height="40"> Programación</h5>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">Ciclo de temperatura:</h5>
+                        <form onsubmit="return update_program('#meeting-temp-fi', 'temperature_program_fi')">
+                            <div class="form-group">
+                                <label for="meeting-temp-fi">Inicio:</label>
+                                <input type="datetime-local" id="meeting-temp-fi" class="form-control" name="meeting-temp-fi" value="2021-12-17T19:30" min="2021-12-17T00:00" max="2022-12-17T00:00">
+                            </div>
+                            <button type="submit" class="btn btn-success btn-sm">Ajustar</button>
+                        </form>
+                        <br>
+                        <form onsubmit="return update_program('#meeting-temp-ff', 'temperature_program_ff')">
+                            <div class="form-group">
+                                <label for="meeting-temp-ff">Fin:</label>
+                                <input type="datetime-local" id="meeting-temp-ff" class="form-control" name="meeting-temp-ff" value="2021-12-17T19:30" min="2021-12-17T00:00" max="2022-12-17T00:00">
+                            </div>
+                            <button type="submit" class="btn btn-success btn-sm">Ajustar</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <!-- Animación -->
+                <div style="margin-top: 10px;">
+                    <p style="text-align: center;">
+                        <img src="img/animaPlantas.gif" alt="Animación de plantas" width="400" height="330">
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
+        integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"
+        integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1"
+        crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
+        integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM"
+        crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.5.0/dist/chart.min.js"></script>
+
+    <script>
+        var greenhouse_temperature = localStorage.getItem('greenhouse_temperature') == null ? $('#temp_input').attr('min') : localStorage.getItem('greenhouse_temperature');
+        var radiator_power = localStorage.getItem('radiator_power') == null ? $('#power_input').attr('min') : localStorage.getItem('radiator_power');
+        var ventilator_power = localStorage.getItem('ventilator_power') == null ? $('#power_ventilator_input').attr('min') : localStorage.getItem('ventilator_power');
+        var irrigation_status = localStorage.getItem('irrigation_status') == null ? false : localStorage.getItem('irrigation_status');
+        var irrigation_program_fi = localStorage.getItem('irrigation_program_fi') == null ? $('#meeting-irrig-fi') : localStorage.getItem('irrigation_program_fi');
+        var irrigation_program_ff = localStorage.getItem('irrigation_program_ff') == null ? $('#meeting-irrig-ff') : localStorage.getItem('irrigation_program_ff');
+        var temperature_program_fi = localStorage.getItem('temperature_program_fi') == null ? $('#meeting-temp-fi') : localStorage.getItem('temperature_program_fi');
+        var temperature_program_ff = localStorage.getItem('temperature_program_ff') == null ? $('#meeting-temp-ff') : localStorage.getItem('temperature_program_ff');
+       
+        /* Valores actuales de cada componente */
+        if(irrigation_status && irrigation_status == 'on'){
+            $('#irrigation_swtich').prop('checked', true);
+            $('#irrigation_inactive').addClass('d-none');
+            $('#irrigation_active').removeClass('d-none');
+        }else{
+            $('#irrigation_swtich').prop('checked', false);
+            $('#irrigation_inactive').removeClass('d-none');
+            $('#irrigation_active').addClass('d-none');
+        }
+        $('#radiator_power').html(radiator_power);
+        $('#ventilator_power').html(ventilator_power);
+
+        /* Valores input seleccionados */
+        $('#meeting-irrig-fi').val(irrigation_program_fi);
+        $('#meeting-irrig-ff').val(irrigation_program_ff);
+        $('#meeting-irrig-fi').html(irrigation_program_fi);
+        $('#meeting-irrig-ff').html(irrigation_program_ff);
+
+        $('#meeting-temp-fi').val(temperature_program_fi);
+        $('#meeting-temp-ff').val(temperature_program_ff);
+        $('#meeting-temp-fi').html(temperature_program_fi);
+        $('#meeting-temp-ff').html(temperature_program_ff);
+
+        $('#temp_input').val(greenhouse_temperature);
+        $('#power_input').val(radiator_power);
+        $('#power_ventilator_input').val(ventilator_power);
+
+        /* Valores dinamicos seleccionados */
+        $('#new_temp').html($('#temp_input').val());
+        $('#new_power').html($('#power_input').val());
+        $('#power_ventilator').html($('#power_ventilator_input').val());
+
+        function change_value(input, id_child) {
+            $(id_child).html(input.value);
+        }
+
+        function on_off_irrigation(input){
+            if(input.checked){
+                localStorage.setItem("irrigation_status", "on");
+                $('#irrigation_inactive').addClass('d-none');
+                $('#irrigation_active').removeClass('d-none');
+                make_request_api('irrigation_status','on')
+            }else{
+                localStorage.setItem("irrigation_status", "off");
+                $('#irrigation_inactive').removeClass('d-none');
+                $('#irrigation_active').addClass('d-none');
+                make_request_api('irrigation_status','off')
+            }
+        }
+
+        function make_request_api(action, value){
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", location.href, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function (aEvt) {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        let new_temp = JSON.parse(xhr.response);
+                        console.log(new_temp);
+                    }
+                    else
+                        console.log("Error loading page\n");
+                }
+            };
+            xhr.send(JSON.stringify({
+                'action': action,
+                'value': value,
+            }));
+        }
+
+        function update_value(input, storage_id) {
+            localStorage.setItem(storage_id, $(input).val());
+            location.reload();
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", location.href, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function (aEvt) {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        let new_temp = JSON.parse(xhr.response);
+                        console.log(new_temp);
+                    }
+                    else
+                        console.log("Error loading page\n");
+                }
+            };
+            xhr.send(JSON.stringify({
+                'action': storage_id,
+                'value': $(input).val(),
+            }));
+            return false;
+        }
+
+        function update_program(input, storage_id) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", location.href, true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+            xhr.onreadystatechange = function (aEvt) {
+                if (xhr.readyState == 4) {
+                    if (xhr.status == 200) {
+                        let new_temp = JSON.parse(xhr.response);
+                    }
+                    else
+                        console.log("Error loading page\n");
+                }
+            };
+            xhr.send(JSON.stringify({
+                'action': storage_id,
+                'value': $(input).val(),
+            }));
+            return false;
+        }
+
+        var labels = []
+        var data_chart = []
+        var xhr = new XMLHttpRequest();
+        xhr.open("POST", location.href, true);
+        xhr.setRequestHeader('Content-Type', 'application/json');
+        xhr.onreadystatechange = function (aEvt) {
+            if (xhr.readyState == 4) {
+                if (xhr.status == 200) {
+                    let new_temp = JSON.parse(xhr.response);
+                    add_hist_temp(new_temp);
+                    draw_chart(labels, data_chart);
+                }
+                else
+                    console.log("Error loading page\n");
+            }
+        };
+        xhr.send(JSON.stringify({
+            'action': 'current_temp',
+            'value': null,
+        }));
+
+        function add_hist_temp(new_temp) {
+            let temps = localStorage.getItem('hist_temps') == null ? '{}' : localStorage.getItem('hist_temps');
+            temps = JSON.parse(temps)
+            for (key in new_temp) {
+                temps[key] = new_temp[key];
+                $('#greenhouse_temperature').html(new_temp[key]);
+            }
+            if (Object.keys(temps).length > 8){
+                temps = reduce_json(temps);
+            }
+            for (key in temps) {
+                labels.push(key)
+                data_chart.push(temps[key])
+            }
+            localStorage.setItem("hist_temps", JSON.stringify(temps))
+        }
+
+        function reduce_json(json){
+            keys = []
+            new_json = {}
+            for(k in json) keys.push(k)
+            for (let index = 1; index < keys.length; index++) {
+                const key = keys[index];
+                new_json[key] = json[key]
+            }
+            return new_json
+        }
+
+        function draw_chart(labels, data_chart) {
+            var ctx = document.getElementById('myChart');
+            var myChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Registros de la temperatura',
+                        data: data_chart,
+                        backgroundColor: [
+                            'rgba(21, 95, 240, 1)',
+                            'rgba(21, 95, 240, 1)',
+                            'rgba(21, 95, 240, 1)',
+                            'rgba(21, 95, 240, 1)',
+                            'rgba(21, 95, 240, 1)',
+                            'rgba(21, 95, 240, 1)'
+                                                      
+                        ],
+                        borderColor: [
+                            'rgba(21, 95, 240, 1)',
+                            'rgba(21, 95, 240, 1)',
+                            'rgba(21, 95, 240, 1)',
+                            'rgba(21, 95, 240, 1)',
+                            'rgba(21, 95, 240, 1)',
+                            'rgba(21, 95, 240, 1)'
+                        ],
+                        borderWidth: 3
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
